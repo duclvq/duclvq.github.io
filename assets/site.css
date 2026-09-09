@@ -12,7 +12,10 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
@@ -27,7 +30,8 @@ body {
 a { color: inherit; }
 
 .shell {
-  width: min(100% - 40px, 1040px);
+  width: calc(100% - 40px);
+  max-width: 1040px;
   margin-inline: auto;
 }
 
@@ -84,6 +88,7 @@ a { color: inherit; }
 .hero {
   display: grid;
   align-content: center;
+  min-width: 0;
   min-height: min(740px, calc(100vh - 72px));
   padding: 72px 0 112px;
 }
@@ -107,6 +112,7 @@ a { color: inherit; }
 }
 
 .hero h1 {
+  min-width: 0;
   max-width: 820px;
   margin: 0;
   font-size: clamp(52px, 9vw, 104px);
@@ -116,6 +122,8 @@ a { color: inherit; }
 }
 
 .intro {
+  min-width: 0;
+  width: 100%;
   max-width: 680px;
   margin: 32px 0 0;
   color: var(--muted);
@@ -376,12 +384,16 @@ a:focus-visible {
 }
 
 @media (max-width: 560px) {
-  .shell { width: min(100% - 32px, 1040px); }
+  .shell { width: calc(100% - 32px); }
   .site-header { flex-direction: column; }
   .site-nav { justify-content: flex-start; margin-left: -10px; }
   .site-nav a { padding-inline: 8px; }
   .site-nav a.external { margin-left: 0; }
   .hero { min-height: auto; padding: 88px 0; }
+  .hero h1 {
+    font-size: clamp(42px, 12.5vw, 56px);
+    letter-spacing: -0.045em;
+  }
   .home-section,
   .page-heading,
   .article-shell { padding: 72px 0 88px; }

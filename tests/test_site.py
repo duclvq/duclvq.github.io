@@ -60,6 +60,13 @@ class MarkdownPublishingTests(unittest.TestCase):
         layout = (ROOT / "_layouts/default.html").read_text()
         self.assertIn("/assets/site.css", layout)
 
+    def test_mobile_layout_guards_against_horizontal_overflow(self):
+        css = (ROOT / "assets/site.css").read_text()
+        self.assertIn("overflow-x: hidden", css)
+        self.assertIn("width: calc(100% - 40px)", css)
+        self.assertIn("width: calc(100% - 32px)", css)
+        self.assertIn("min-width: 0", css)
+
 
 if __name__ == "__main__":
     unittest.main()
