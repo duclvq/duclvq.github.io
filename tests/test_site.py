@@ -67,6 +67,24 @@ class MarkdownPublishingTests(unittest.TestCase):
         self.assertIn("width: calc(100% - 32px)", css)
         self.assertIn("min-width: 0", css)
 
+    def test_synthid_experiment_is_published_with_evidence(self):
+        article_path = ROOT / "_posts/2026-09-09-synthid-text-watermarking-with-gpt2.md"
+        image_path = ROOT / "assets/lab/synthid-text-lab.png"
+        self.assertTrue(article_path.is_file())
+        self.assertTrue(image_path.is_file())
+        article = article_path.read_text()
+        for evidence in [
+            "GPT-2",
+            "SynthID",
+            "13.7406",
+            "0.5627",
+            "19 Python tests",
+            "4 JavaScript tests",
+            "4 Playwright tests",
+            "single smoke run",
+        ]:
+            self.assertIn(evidence, article)
+
 
 if __name__ == "__main__":
     unittest.main()
