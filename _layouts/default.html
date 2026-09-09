@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ page.description | default: site.description | escape }}">
+  <meta name="theme-color" content="#ffffff">
+  <title>{% if page.title and page.url != '/' %}{{ page.title }} · {% endif %}{{ site.title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+</head>
+<body>
+  <header class="site-header shell">
+    <a class="mark" href="{{ '/' | relative_url }}" aria-label="Le Viet Duc — home">
+      <span class="mark-shape" aria-hidden="true"></span>
+      <span>Le Viet Duc</span>
+    </a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      <a href="{{ '/' | relative_url }}"{% if page.url == '/' %} class="active" aria-current="page"{% endif %}>Home</a>
+      <a href="{{ '/lab/' | relative_url }}"{% if page.url contains '/lab/' %} class="active" aria-current="page"{% endif %}>Lab</a>
+      <a href="{{ '/projects/' | relative_url }}"{% if page.url contains '/projects/' %} class="active" aria-current="page"{% endif %}>Projects</a>
+      <a href="{{ '/about/' | relative_url }}"{% if page.url contains '/about/' %} class="active" aria-current="page"{% endif %}>About</a>
+      <a class="external" href="https://github.com/duclvq" rel="me">GitHub ↗</a>
+    </nav>
+  </header>
+
+  <main class="site-main shell">
+    {{ content }}
+  </main>
+
+  <footer class="site-footer shell">
+    <span>© <span id="year"></span> Le Viet Duc</span>
+    <div class="footer-links">
+      <a href="mailto:leduchtth@gmail.com">Email</a>
+      <a href="https://github.com/duclvq" rel="me">GitHub ↗</a>
+    </div>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

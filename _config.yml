@@ -1,0 +1,11 @@
+title: Le Viet Duc
+description: Experiments, pet projects, and notes by Le Viet Duc.
+url: https://duclvq.github.io
+baseurl: ""
+timezone: Asia/Ho_Chi_Minh
+permalink: /lab/:title/
+markdown: kramdown
+future: false
+exclude:
+  - README.md
+  - tests

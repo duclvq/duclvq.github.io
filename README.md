@@ -2,10 +2,59 @@
 
 Personal website for **Le Viet Duc**, published with GitHub Pages at [duclvq.github.io](https://duclvq.github.io).
 
-## Development
+## Navigation
 
-The site is a dependency-free static page. Open `index.html` locally to preview it.
+The site intentionally uses a minimal structure:
 
-## Deployment
+- **Home** — introduction and latest Lab entries
+- **Lab** — experiments, technology notes, and build logs
+- **Projects** — curated pet projects
+- **About** — background and contact information
 
-GitHub Pages publishes the `main` branch from the repository root.
+## Publish a Markdown Lab entry
+
+Articles are normal Markdown files stored in `_posts/`. GitHub Pages rebuilds the website automatically after a commit reaches `main`.
+
+### From the GitHub web editor
+
+1. Open the [`_posts`](https://github.com/duclvq/duclvq.github.io/tree/main/_posts) directory.
+2. Select **Add file → Create new file**.
+3. Name the file `_posts/YYYY-MM-DD-title.md`, for example `_posts/2026-09-10-testing-a-local-model.md`.
+4. Copy the front matter below, then write the article in Markdown.
+5. Select **Commit changes**. GitHub Pages will publish it under `/lab/title/`.
+
+```markdown
+---
+layout: post
+title: "Testing a local model"
+date: 2026-09-10 09:00:00 +0700
+description: "What I tested and what happened."
+tags: [ai, experiment]
+---
+
+Start writing here.
+
+## Setup
+
+Markdown content...
+
+## Results
+
+Markdown content...
+```
+
+### From a local checkout
+
+Create `_posts/YYYY-MM-DD-title.md`, then run:
+
+```bash
+git add _posts/YYYY-MM-DD-title.md
+git commit -m "post: publish article title"
+git push origin main
+```
+
+An unpublished writing template is available at `_drafts/article-template.md`.
+
+## Supported Markdown
+
+GitHub Pages renders headings, links, images, lists, blockquotes, fenced code blocks, inline code, and tables through Jekyll and Kramdown.
