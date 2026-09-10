@@ -67,6 +67,13 @@ class MarkdownPublishingTests(unittest.TestCase):
         self.assertIn("width: calc(100% - 32px)", css)
         self.assertIn("min-width: 0", css)
 
+    def test_llm_server_experiment_is_published_with_a_concurrency_comparison(self):
+        post = (ROOT / "_posts/2026-09-10-llama-cpp-vs-vllm-token-speed.md").read_text()
+        self.assertIn('title: "Two ways to serve the same local LLM"', post)
+        self.assertIn("llama.cpp", post)
+        self.assertIn("vLLM", post)
+        self.assertIn("| 24 |", post)
+
     def test_synthid_experiment_is_published_with_evidence(self):
         article_path = ROOT / "_posts/2026-09-09-synthid-text-watermarking-with-gpt2.md"
         image_path = ROOT / "assets/lab/synthid-text-lab.png"
