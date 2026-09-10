@@ -95,6 +95,7 @@ class MarkdownPublishingTests(unittest.TestCase):
             asset_root / "app.js",
             asset_root / "webgpu-worker.js",
             asset_root / "webgpu-runtime.mjs",
+            asset_root / "synthid-demo.mjs",
         ]
         missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
         self.assertEqual([], missing, f"Missing interactive demo files: {missing}")
@@ -123,7 +124,21 @@ class MarkdownPublishingTests(unittest.TestCase):
         self.assertIn("about 112 MB", demo)
         self.assertNotIn("2.7 GB", demo)
         self.assertIn('device: "webgpu"', worker)
-        self.assertIn('if (hasWebGPU(window)) {\n  setBusy(false);', app)
+        self.assertIn('if (hasWebGPU(window)) {\n  setGenerateBusy(false);', app)
+        demo_css = (asset_root / "app.css").read_text()
+        self.assertIn(".intro > div { min-width: 0; }", demo_css)
+        self.assertIn("font-size: clamp(2.45rem, 13.5vw, 3.2rem)", demo_css)
+        for element_id in [
+            'id="watermark"',
+            'id="sendToDetectorBtn"',
+            'id="detectText"',
+            'id="detectBtn"',
+            'id="verdictContent"',
+            'id="signalTrace"',
+        ]:
+            self.assertIn(element_id, demo)
+        self.assertIn('type === "detect"', worker)
+        self.assertIn("LogitsProcessor", worker)
 
 
 if __name__ == "__main__":

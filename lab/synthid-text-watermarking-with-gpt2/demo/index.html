@@ -70,6 +70,12 @@
             </label>
           </div>
 
+          <label class="watermark-switch">
+            <input id="watermark" type="checkbox" checked>
+            <span class="switch-track" aria-hidden="true"><span></span></span>
+            <span><strong>Apply public demo watermark</strong><small>SynthID-compatible g-values · educational key</small></span>
+          </label>
+
           <button class="action-btn" id="generateBtn" type="button" disabled>
             <span>Checking WebGPU…</span><span>→</span>
           </button>
@@ -82,12 +88,56 @@
             <button class="quiet-btn" id="copyBtn" type="button" disabled>Copy</button>
           </div>
           <div class="output empty" id="generatedOutput" tabindex="0">Your SmolLM2 response will appear here.</div>
+          <button class="secondary-btn" id="sendToDetectorBtn" type="button" disabled>Send output to detector ↓</button>
           <div class="privacy-note">
-            <strong>Unwatermarked by design.</strong>
-            <p>A secure SynthID key cannot be shipped in public client-side JavaScript. The Python experiment handles watermark generation and detection; this page demonstrates only local WebGPU inference.</p>
+            <strong>Public educational configuration.</strong>
+            <p>The browser can generate and detect a matching statistical signal, but its key is visible in the source. It demonstrates the mechanism; it is not a secure production watermark.</p>
           </div>
         </article>
       </section>
+
+      <section class="workspace detector-workspace" aria-label="Watermark detector and signal trace">
+        <article class="panel detector-panel">
+          <div class="panel-head">
+            <div><span class="panel-number">03</span><h2>Paste & detect</h2></div>
+            <span class="method-tag">Browser-side</span>
+          </div>
+          <label class="field-label" for="detectText">Text to inspect</label>
+          <textarea id="detectText" rows="8" placeholder="Paste a sufficiently long passage here…"></textarea>
+          <button class="action-btn" id="detectBtn" type="button"><span>Analyze watermark signal</span><span>⌁</span></button>
+          <p class="cold-note">Detection uses SmolLM2 token IDs, the public demo key, repeated-context filtering, and the reference mean-score statistic.</p>
+        </article>
+
+        <article class="panel verdict-panel">
+          <div class="panel-head">
+            <div><span class="panel-number">04</span><h2>Signal trace</h2></div>
+            <span class="method-tag">Zero-bit watermark</span>
+          </div>
+          <div class="verdict-empty" id="verdictEmpty">
+            <div class="scan-glyph" aria-hidden="true">⌁</div>
+            <p>Generate or paste text to extract its statistical watermark evidence.</p>
+          </div>
+          <div class="verdict-content hidden" id="verdictContent">
+            <span class="verdict-label">Detector says</span>
+            <strong class="verdict-title" id="verdictTitle">Watermark detected</strong>
+            <p id="verdictDescription"></p>
+            <div class="meter" aria-hidden="true"><div id="confidenceFill"></div><span class="threshold-line"></span></div>
+            <div class="stats">
+              <div><small>z-score</small><strong id="zValue">—</strong></div>
+              <div><small>mean g</small><strong id="meanValue">—</strong></div>
+              <div><small>scored tokens</small><strong id="tokensValue">—</strong></div>
+              <div><small>threshold</small><strong id="thresholdValue">3.00</strong></div>
+            </div>
+            <div class="trace-head"><strong>Per-token g-value trace</strong><span>Higher bars carry more 1-bits</span></div>
+            <div class="signal-trace" id="signalTrace" aria-label="Per-token watermark signal"></div>
+          </div>
+        </article>
+      </section>
+
+      <aside class="research-note">
+        <strong>Detection, not payload recovery.</strong>
+        <span>SynthID Text is a zero-bit statistical watermark. This view extracts evidence—the g-value pattern, mean score, and z-score—not a hidden message or author ID.</span>
+      </aside>
 
       <aside class="credits">
         <strong>Runs in your browser.</strong>

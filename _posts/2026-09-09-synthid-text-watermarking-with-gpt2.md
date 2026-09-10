@@ -24,8 +24,10 @@ the original 2.7 GB NanoChat download with a much more practical web experience.
 
 <p><a class="button primary" href="/lab/synthid-text-watermarking-with-gpt2/demo/">Launch the WebGPU demo →</a></p>
 
-The browser output is deliberately unwatermarked because public JavaScript cannot
-protect a SynthID key. You can also [open the interactive SynthID mechanism
+The browser demo includes an optional **public educational watermark**, a
+matching paste-in detector, and a per-token g-value signal trace. The configuration
+is intentionally visible in the source, so it demonstrates the mechanism rather
+than production security. You can also [open the interactive SynthID mechanism
 visualization](/lab/synthid-text-watermarking-with-gpt2/how-it-works/).
 
 ![SynthID Text Lab interface showing the generation and detection workflow]({{ '/assets/lab/synthid-text-lab.png' | relative_url }})
@@ -58,13 +60,15 @@ a threshold of **3.0**.
 
 The original experiment used **NanoChat d32** for browser inference. The public
 demo now uses **SmolLM2 135M Instruct** through Transformers.js and WebGPU in a
-module Web Worker. That keeps generation off the Flask backend, leaves the UI
-responsive, and cuts the first-run download by roughly 24×.
+module Web Worker. It can generate with or without a public watermark, score
+pasted text with matching g-values, and expose the token-level signal. That keeps
+the workflow off the Flask backend, leaves the UI responsive, and cuts the
+first-run download by roughly 24×.
 
-There is one deliberate security boundary: browser WebGPU generations are
-**not watermarked**. Shipping the keyed g-function to client-side JavaScript
-would disclose the watermark key to every visitor. The complete SynthID workflow
-therefore stays in the Python backend.
+There is one deliberate security boundary: the browser watermark is
+**educational, not secret**. Its key and sampling table are public, so anyone can
+inspect or reproduce the signal. A production deployment would keep protected
+configuration and a calibrated detector behind an authenticated backend.
 
 ## A verified smoke run
 
