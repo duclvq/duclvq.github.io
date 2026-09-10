@@ -17,9 +17,10 @@ copy it, paste it into a detector, and inspect the resulting score.
 
 ## Try the interactive WebGPU demo
 
-The browser edition runs NanoChat d32 locally through Transformers.js and WebGPU.
-It does not need my Python server, and your prompt stays in your browser. The first
-run downloads about 2.7 GB of quantized model files from Hugging Face.
+The public browser edition runs **SmolLM2 135M Instruct** locally through
+Transformers.js and WebGPU. It does not need my Python server, and your prompt
+stays in your browser. Its q4f16 model download is about **112 MB**, replacing
+the original 2.7 GB NanoChat download with a much more practical web experience.
 
 <p><a class="button primary" href="/lab/synthid-text-watermarking-with-gpt2/demo/">Launch the WebGPU demo →</a></p>
 
@@ -55,9 +56,10 @@ It removes end-of-sequence and repeated-context positions, calculates their mean
 and reports a transparent normal-approximation z-score. The demo currently uses
 a threshold of **3.0**.
 
-The browser path runs **NanoChat d32** through Transformers.js and WebGPU in a
-module Web Worker. That keeps generation off the Flask backend and leaves the UI
-responsive while the model runs.
+The original experiment used **NanoChat d32** for browser inference. The public
+demo now uses **SmolLM2 135M Instruct** through Transformers.js and WebGPU in a
+module Web Worker. That keeps generation off the Flask backend, leaves the UI
+responsive, and cuts the first-run download by roughly 24×.
 
 There is one deliberate security boundary: browser WebGPU generations are
 **not watermarked**. Shipping the keyed g-function to client-side JavaScript
@@ -133,3 +135,5 @@ lengths, temperatures, and transformation attacks—not just more hand-picked de
 - [Scalable watermarking for identifying large language model outputs — Nature](https://www.nature.com/articles/s41586-024-08025-4)
 - [NanoChat by Andrej Karpathy](https://github.com/karpathy/nanochat)
 - [NanoChat d32 ONNX/WebGPU conversion](https://huggingface.co/onnx-community/nanochat-d32-ONNX)
+- [SmolLM2 135M Instruct](https://huggingface.co/HuggingFaceTB/SmolLM2-135M-Instruct)
+- [SmolLM2 135M ONNX/WebGPU conversion](https://huggingface.co/onnx-community/SmolLM2-135M-Instruct-ONNX-GQA)

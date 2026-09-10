@@ -31,7 +31,7 @@ function setBusy(busy) {
   generateBtn.querySelector("span:first-child").textContent = busy ? "Working locally…" : "Generate with WebGPU";
 }
 
-function clearOutput(message = "Your NanoChat continuation will appear here.") {
+function clearOutput(message = "Your SmolLM2 response will appear here.") {
   lastContinuation = "";
   output.textContent = message;
   output.classList.add("empty");
@@ -39,12 +39,12 @@ function clearOutput(message = "Your NanoChat continuation will appear here.") {
 }
 
 function progressLabel(progress) {
-  if (!progress || typeof progress !== "object") return "Downloading NanoChat d32…";
+  if (!progress || typeof progress !== "object") return "Downloading SmolLM2 135M…";
   if (progress.status === "progress" && Number.isFinite(progress.progress)) {
     return `Downloading ${progress.file ?? "model file"} · ${Math.round(progress.progress)}%`;
   }
   if (progress.file) return `Loading ${progress.file}…`;
-  return "Preparing NanoChat d32 on WebGPU…";
+  return "Preparing SmolLM2 135M on WebGPU…";
 }
 
 function rejectPending(error) {
@@ -122,7 +122,7 @@ generateBtn.addEventListener("click", async () => {
     output.textContent = result.continuation;
     output.classList.remove("empty");
     copyBtn.disabled = false;
-    setStatus("NanoChat d32 · running locally on WebGPU", "loaded");
+    setStatus("SmolLM2 135M · running locally on WebGPU", "loaded");
   } catch (error) {
     clearOutput("Generation did not complete. Check browser compatibility and try again.");
     setStatus("Generation failed", "error");

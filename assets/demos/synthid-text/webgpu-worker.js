@@ -1,4 +1,4 @@
-// Public browser demo: NanoChat d32 runs locally through Transformers.js + WebGPU.
+// Public browser demo: SmolLM2 135M runs locally through Transformers.js + WebGPU.
 import { env, pipeline } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0";
 import {
   BROWSER_MODEL_ID,
@@ -21,10 +21,10 @@ async function getGenerator(id) {
   }
 
   if (!generatorPromise) {
-    send("status", { id, message: "Preparing WebGPU and downloading NanoChat d32…" });
+    send("status", { id, message: "Preparing WebGPU and downloading SmolLM2 135M…" });
     generatorPromise = pipeline("text-generation", BROWSER_MODEL_ID, {
       device: "webgpu",
-      dtype: "q4",
+      dtype: "q4f16",
       progress_callback: (progress) => send("progress", { id, progress }),
     }).catch((error) => {
       generatorPromise = undefined;
@@ -40,7 +40,7 @@ self.addEventListener("message", async (event) => {
 
   try {
     const generator = await getGenerator(id);
-    send("status", { id, message: "Generating with NanoChat d32 on WebGPU…" });
+    send("status", { id, message: "Generating with SmolLM2 135M on WebGPU…" });
     const options = buildGenerationOptions({ maxTokens, temperature });
     const messages = [
       { role: "system", content: "You are a helpful assistant." },
@@ -48,11 +48,11 @@ self.addEventListener("message", async (event) => {
     ];
     const rows = await generator(messages, options);
     if (!Array.isArray(rows) || rows.length === 0 || !("generated_text" in rows[0])) {
-      throw new Error("NanoChat returned an unexpected generation result.");
+      throw new Error("SmolLM2 returned an unexpected generation result.");
     }
     const continuation = extractAssistantText(rows[0].generated_text);
     if (!continuation.trim()) {
-      throw new Error("NanoChat returned an empty generation result.");
+      throw new Error("SmolLM2 returned an empty generation result.");
     }
     send("result", {
       id,

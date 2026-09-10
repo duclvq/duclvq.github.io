@@ -1,4 +1,4 @@
-export const BROWSER_MODEL_ID = "onnx-community/nanochat-d32-ONNX";
+export const BROWSER_MODEL_ID = "onnx-community/SmolLM2-135M-Instruct-ONNX-GQA";
 
 export function hasWebGPU(scope = globalThis) {
   return Boolean(scope?.navigator?.gpu);
@@ -31,12 +31,12 @@ export function extractAssistantText(generatedText) {
     const content = assistantMessages.at(-1)?.content;
     if (content === undefined) return "";
     if (typeof content !== "string") {
-      throw new Error("NanoChat returned an unexpected assistant message.");
+      throw new Error("The browser model returned an unexpected assistant message.");
     }
     return content;
   }
   if (typeof generatedText !== "string") {
-    throw new Error("NanoChat returned an unexpected generated_text value.");
+    throw new Error("The browser model returned an unexpected generated_text value.");
   }
   return generatedText;
 }
