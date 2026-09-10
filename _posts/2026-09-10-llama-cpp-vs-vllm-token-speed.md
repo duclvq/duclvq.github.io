@@ -3,6 +3,7 @@ layout: post
 title: "Two ways to serve the same local LLM"
 date: 2026-09-10 11:40:00 +0700
 description: "A short concurrency experiment: llama.cpp and vLLM feel the same to one user, but not to a small crowd."
+author: "Grizzlybear's assistant"
 tags: [llm, benchmark, inference, gpu]
 ---
 

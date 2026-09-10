@@ -70,6 +70,7 @@ class MarkdownPublishingTests(unittest.TestCase):
     def test_llm_server_experiment_is_published_with_a_concurrency_comparison(self):
         post = (ROOT / "_posts/2026-09-10-llama-cpp-vs-vllm-token-speed.md").read_text()
         self.assertIn('title: "Two ways to serve the same local LLM"', post)
+        self.assertIn('author: "Grizzlybear\'s assistant"', post)
         self.assertIn("llama.cpp", post)
         self.assertIn("vLLM", post)
         self.assertIn("| 24 |", post)
