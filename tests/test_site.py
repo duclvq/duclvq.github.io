@@ -85,6 +85,40 @@ class MarkdownPublishingTests(unittest.TestCase):
         ]:
             self.assertIn(evidence, article)
 
+    def test_synthid_lab_keeps_an_interactive_webgpu_demo(self):
+        demo_root = ROOT / "lab/synthid-text-watermarking-with-gpt2/demo"
+        asset_root = ROOT / "assets/demos/synthid-text"
+        required = [
+            demo_root / "index.html",
+            ROOT / "lab/synthid-text-watermarking-with-gpt2/how-it-works/index.html",
+            asset_root / "app.css",
+            asset_root / "app.js",
+            asset_root / "webgpu-worker.js",
+            asset_root / "webgpu-runtime.mjs",
+        ]
+        missing = [str(path.relative_to(ROOT)) for path in required if not path.is_file()]
+        self.assertEqual([], missing, f"Missing interactive demo files: {missing}")
+
+        article = (ROOT / "_posts/2026-09-09-synthid-text-watermarking-with-gpt2.md").read_text()
+        self.assertIn("demo_url: /lab/synthid-text-watermarking-with-gpt2/demo/", article)
+        self.assertIn("/lab/synthid-text-watermarking-with-gpt2/demo/", article)
+        lab_index = (ROOT / "lab/index.html").read_text()
+        home = (ROOT / "index.html").read_text()
+        self.assertIn("post.demo_url", lab_index)
+        self.assertIn("post.demo_url", home)
+        draft = (ROOT / "_drafts/article-template.md").read_text()
+        readme = (ROOT / "README.md").read_text()
+        self.assertIn("demo_url:", draft)
+        self.assertIn("Interactive Lab entries", readme)
+        app = (asset_root / "app.js").read_text()
+        worker = (asset_root / "webgpu-worker.js").read_text()
+        self.assertIn('new URL("./webgpu-worker.js", import.meta.url)', app)
+        self.assertNotIn("/api/", app)
+        self.assertNotIn('new URL("/models/"', worker)
+        self.assertIn("https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0", worker)
+        self.assertIn('device: "webgpu"', worker)
+        self.assertIn('if (hasWebGPU(window)) {\n  setBusy(false);', app)
+
 
 if __name__ == "__main__":
     unittest.main()

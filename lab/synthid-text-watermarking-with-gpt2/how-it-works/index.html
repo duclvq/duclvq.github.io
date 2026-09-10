@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inside SynthID Text — Interactive Visual Explainer</title>
+  <style>
+    :root {
+      --paper: #f3efe4;
+      --panel: #fffdf7;
+      --ink: #18211d;
+      --muted: #667069;
+      --line: #c9c8bc;
+      --accent: #e65032;
+      --accent-soft: #f9d9cc;
+      --mint: #137c66;
+      --mint-soft: #d8ebe4;
+      --gold: #a96f10;
+      --gold-soft: #f4e7c5;
+      --dark: #18211d;
+      --radius: 16px;
+      --shadow: 0 14px 35px rgba(24, 33, 29, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: "Avenir Next", "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+
+    .page {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 28px clamp(18px, 4vw, 64px) 52px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr);
+      gap: 48px;
+      align-items: end;
+      padding: 28px 0 34px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      color: var(--mint);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 30px;
+      height: 2px;
+      background: var(--mint);
+    }
+
+    h1 {
+      margin: 13px 0 10px;
+      max-width: 900px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(3rem, 7vw, 7rem);
+      font-weight: 500;
+      line-height: .88;
+      letter-spacing: -.055em;
+    }
+
+    .lede {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.5vw, 1.22rem);
+    }
+
+    .header-note {
+      padding: 18px 0 4px 26px;
+      border-left: 2px solid var(--accent);
+    }
+
+    .header-note strong { display: block; margin-bottom: 7px; font-size: .92rem; }
+    .header-note p { margin: 0; color: var(--muted); font-size: .87rem; }
+
+    .control-rail {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 -8px 30px;
+      padding: 13px 8px;
+      background: rgba(243, 239, 228, .94);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .control-rail button {
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .control-rail button:hover { transform: translateY(-1px); border-color: var(--ink); }
+    .control-rail button:focus-visible { outline: 3px solid var(--gold-soft); outline-offset: 2px; }
+    .control-rail button.primary { background: var(--dark); color: white; border-color: var(--dark); }
+    .step-count { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: .85rem; }
+
+    .stage {
+      min-height: 610px;
+      display: grid;
+      grid-template-columns: 255px minmax(0, 1fr);
+      gap: 28px;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .step-btn {
+      position: relative;
+      display: grid;
+      grid-template-columns: 38px 1fr;
+      gap: 10px;
+      align-items: center;
+      width: 100%;
+      min-height: 62px;
+      padding: 8px 10px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .step-btn::after {
+      content: "";
+      position: absolute;
+      left: 28px;
+      top: 55px;
+      width: 1px;
+      height: 14px;
+      background: var(--line);
+    }
+
+    .step-btn:last-child::after { display: none; }
+    .step-btn.active { color: var(--ink); background: var(--panel); box-shadow: var(--shadow); }
+    .step-btn.complete { color: var(--mint); }
+    .step-num {
+      display: grid;
+      place-items: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      font-size: .78rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      background: var(--paper);
+    }
+    .step-btn.active .step-num { color: white; border-color: var(--accent); background: var(--accent); }
+    .step-btn.complete .step-num { border-color: var(--mint); background: var(--mint-soft); }
+    .step-copy strong { display: block; font-size: .88rem; }
+    .step-copy span { display: block; margin-top: 2px; font-size: .74rem; color: var(--muted); }
+
+    .viewport {
+      position: relative;
+      overflow: hidden;
+      min-height: 590px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .scene {
+      display: none;
+      min-height: 590px;
+      padding: clamp(22px, 4vw, 48px);
+      animation: scene-in .35s ease both;
+    }
+    .scene.active { display: block; }
+
+    @keyframes scene-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scene-kicker {
+      color: var(--accent);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin: 7px 0 8px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2rem, 4vw, 3.9rem);
+      font-weight: 500;
+      line-height: 1.02;
+      letter-spacing: -.035em;
+    }
+
+    .scene-intro { margin: 0 0 28px; max-width: 760px; color: var(--muted); }
+
+    .distribution {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(52px, 1fr));
+      gap: 10px;
+      height: 250px;
+      align-items: end;
+      padding: 25px 8px 0;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .bar-wrap { height: 100%; display: flex; flex-direction: column; justify-content: end; align-items: center; gap: 8px; }
+    .prob { color: var(--muted); font-size: .7rem; font-variant-numeric: tabular-nums; }
+    .bar {
+      width: min(54px, 80%);
+      height: var(--h);
+      min-height: 6px;
+      background: var(--mint);
+      border-radius: 7px 7px 0 0;
+      transform-origin: bottom;
+      animation: grow .65s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .bar.accent { background: var(--accent); }
+    .bar-label { min-height: 32px; font-size: clamp(.66rem, 1vw, .84rem); text-align: center; }
+    @keyframes grow { from { transform: scaleY(0); } }
+
+    .context-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 25px;
+      align-items: center;
+    }
+    .token {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--paper);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .78rem;
+    }
+    .token.next { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); font-weight: 800; }
+    .arrow { color: var(--muted); }
+
+    .hash-layout {
+      display: grid;
+      grid-template-columns: minmax(210px, .8fr) 60px minmax(320px, 1.35fr);
+      gap: 18px;
+      align-items: center;
+      margin-top: 38px;
+    }
+    .input-stack { display: grid; gap: 10px; }
+    .datum {
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--paper);
+    }
+    .datum small { display: block; margin-bottom: 5px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-size: .65rem; }
+    .datum code { color: var(--ink); word-break: break-word; }
+    .hash-arrow { text-align: center; font-size: 2rem; color: var(--accent); }
+    .g-matrix {
+      display: grid;
+      grid-template-columns: 1fr repeat(3, 54px);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .g-cell { padding: 10px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; font-size: .78rem; }
+    .g-cell:nth-child(4n) { border-right: 0; }
+    .g-cell.head { background: var(--dark); color: white; font-weight: 800; }
+    .g-cell.token-name { text-align: left; font-weight: 700; }
+    .g-cell.one { background: var(--mint-soft); color: var(--mint); font-weight: 900; }
+
+    .tournament {
+      display: grid;
+      grid-template-columns: 1.15fr 42px .8fr 42px .55fr 42px .36fr;
+      gap: 8px;
+      align-items: center;
+      margin-top: 30px;
+      min-height: 315px;
+    }
+    .round { display: grid; gap: 8px; }
+    .round-label { margin-bottom: 4px; color: var(--muted); font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .candidate {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      font-size: .76rem;
+    }
+    .candidate.winner { border-color: var(--mint); background: var(--mint-soft); color: var(--mint); font-weight: 800; }
+    .candidate.final { min-height: 85px; border: 2px solid var(--accent); background: var(--accent-soft); color: var(--accent); font-size: 1rem; font-weight: 900; }
+    .g-badge { display: inline-grid; place-items: center; min-width: 23px; height: 23px; border-radius: 50%; background: white; font-size: .68rem; }
+    .round-arrow { color: var(--line); font-size: 1.6rem; text-align: center; }
+
+    .sequence-box {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--paper);
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.35rem, 2.4vw, 2.25rem);
+      line-height: 1.5;
+    }
+    .watermarked-word {
+      position: relative;
+      white-space: nowrap;
+    }
+    .watermarked-word::after {
+      content: attr(data-g);
+      position: absolute;
+      left: 50%;
+      bottom: -15px;
+      transform: translateX(-50%);
+      color: var(--mint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .52rem;
+      font-weight: 800;
+      opacity: 0;
+      transition: opacity .2s ease;
+    }
+    .sequence-box.reveal .watermarked-word { background: var(--mint-soft); }
+    .sequence-box.reveal .watermarked-word::after { opacity: 1; }
+    .reveal-btn { margin-top: 26px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); cursor: pointer; font-weight: 800; }
+
+    .detector-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.15fr) minmax(280px, .85fr);
+      gap: 28px;
+      align-items: stretch;
+      margin-top: 25px;
+    }
+    .score-panel { padding: 24px; border: 1px solid var(--line); border-radius: 15px; background: var(--paper); }
+    .score-formula { margin: 5px 0 20px; font-family: Georgia, serif; font-size: clamp(1.3rem, 2.7vw, 2.3rem); }
+    .score-track { position: relative; height: 16px; border-radius: 999px; background: #dfded5; }
+    .score-fill { width: 76%; height: 100%; border-radius: inherit; background: var(--mint); transition: width .5s ease; }
+    .threshold { position: absolute; left: 62%; top: -9px; width: 2px; height: 34px; background: var(--accent); }
+    .threshold::after { content: "threshold"; position: absolute; top: 35px; left: 50%; transform: translateX(-50%); color: var(--accent); font-size: .65rem; }
+    .score-labels { display: flex; justify-content: space-between; margin-top: 27px; color: var(--muted); font-size: .7rem; }
+    .verdict {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 28px;
+      border-radius: 15px;
+      background: var(--dark);
+      color: white;
+    }
+    .verdict small { color: #aab7b0; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; }
+    .verdict strong { margin: 8px 0; font-family: Georgia, serif; font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 500; }
+    .verdict p { margin: 0; color: #bac5bf; font-size: .82rem; }
+
+    .lab {
+      margin-top: 34px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+    }
+    .lab h3 { margin: 0 0 15px; font-size: .92rem; }
+    .sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+    .slider-row label { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: .75rem; font-weight: 800; }
+    .slider-row input { width: 100%; accent-color: var(--accent); }
+    .slider-note { margin-top: 5px; color: var(--muted); font-size: .68rem; }
+
+    .takeaways {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(260px, .5fr);
+      gap: 40px;
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+    }
+    .takeaways h2 { max-width: 800px; }
+    .rule-list { display: grid; gap: 0; margin-top: 24px; }
+    .rule {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      padding: 15px 0;
+      border-top: 1px solid var(--line);
+    }
+    .rule-num { color: var(--accent); font-family: Georgia, serif; font-size: 1.4rem; }
+    .rule strong { display: block; margin-bottom: 3px; }
+    .rule p { margin: 0; color: var(--muted); font-size: .86rem; }
+    .caveat { align-self: end; padding: 22px; border: 1px solid var(--gold); border-radius: 14px; background: var(--gold-soft); }
+    .caveat strong { display: block; margin-bottom: 7px; color: #704a0e; }
+    .caveat p { margin: 0; color: #745b31; font-size: .82rem; }
+
+    footer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 24px;
+      align-items: end;
+      margin-top: 58px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .72rem;
+    }
+    .sources { display: grid; gap: 5px; }
+    .sources a:hover { color: var(--ink); }
+    .tag { padding: 6px 9px; border: 1px solid var(--line); border-radius: 999px; white-space: nowrap; }
+
+    @media (max-width: 920px) {
+      header, .takeaways { grid-template-columns: 1fr; gap: 24px; }
+      .stage { grid-template-columns: 1fr; }
+      .steps { display: grid; grid-template-columns: repeat(5, minmax(58px, 1fr)); }
+      .step-btn { display: flex; justify-content: center; min-height: 52px; padding: 6px; }
+      .step-copy { display: none; }
+      .step-btn::after { display: none; }
+      .hash-layout { grid-template-columns: 1fr; }
+      .hash-arrow { transform: rotate(90deg); }
+      .tournament { grid-template-columns: 1fr; }
+      .round-arrow { transform: rotate(90deg); }
+      .round { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .round-label { grid-column: 1 / -1; }
+      .detector-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 620px) {
+      .page { padding-inline: 14px; }
+      header { padding-top: 10px; }
+      h1 { font-size: 3.35rem; }
+      .control-rail { overflow-x: auto; }
+      .step-count { display: none; }
+      .scene { padding: 20px 16px; }
+      .distribution { grid-template-columns: repeat(4, 1fr); height: 420px; }
+      .sliders { grid-template-columns: 1fr; }
+      footer { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div>
+        <div class="eyebrow">Interactive systems explainer</div>
+        <h1>Inside<br>SynthID Text</h1>
+        <p class="lede">A watermark is not hidden characters. It is a faint statistical pattern woven into token choices while the language model writes.</p>
+      </div>
+      <aside class="header-note">
+        <strong>What you are seeing</strong>
+        <p>A conceptual, interactive reconstruction of the generation and detection loop. The real implementation uses many watermarking keys and a trained detector.</p>
+      </aside>
+    </header>
+
+    <nav class="control-rail" aria-label="Visualization controls">
+      <button class="primary" id="playBtn" type="button">▶ Play the pipeline</button>
+      <button id="prevBtn" type="button" aria-label="Previous step">← Back</button>
+      <button id="nextBtn" type="button">Next →</button>
+      <button id="resetBtn" type="button">Reset</button>
+      <span class="step-count" id="stepCount">Step 1 of 5</span>
+    </nav>
+
+    <section class="stage" aria-label="SynthID Text pipeline">
+      <nav class="steps" aria-label="Pipeline steps">
+        <button class="step-btn active" data-step="0" type="button">
+          <span class="step-num">01</span><span class="step-copy"><strong>Predict</strong><span>Build next-token probabilities</span></span>
+        </button>
+        <button class="step-btn" data-step="1" type="button">
+          <span class="step-num">02</span><span class="step-copy"><strong>Key + score</strong><span>Create private g-values</span></span>
+        </button>
+        <button class="step-btn" data-step="2" type="button">
+          <span class="step-num">03</span><span class="step-copy"><strong>Tournament</strong><span>Nudge token selection</span></span>
+        </button>
+        <button class="step-btn" data-step="3" type="button">
+          <span class="step-num">04</span><span class="step-copy"><strong>Repeat</strong><span>Accumulate a faint signal</span></span>
+        </button>
+        <button class="step-btn" data-step="4" type="button">
+          <span class="step-num">05</span><span class="step-copy"><strong>Detect</strong><span>Reconstruct and aggregate</span></span>
+        </button>
+      </nav>
+
+      <div class="viewport">
+        <article class="scene active" data-scene="0">
+          <div class="scene-kicker">Step 01 · Language model</div>
+          <h2>Many words could come next.</h2>
+          <p class="scene-intro">GPT-2 reads the context and assigns every token a probability. Ordinary generation samples directly from this distribution.</p>
+          <div class="distribution" aria-label="Illustrative next-token probability distribution">
+            <div class="bar-wrap"><span class="prob">8%</span><div class="bar" style="--h:31%"></div><span class="bar-label">papaya</span></div>
+            <div class="bar-wrap"><span class="prob">26%</span><div class="bar accent" style="--h:100%"></div><span class="bar-label">bananas</span></div>
+            <div class="bar-wrap"><span class="prob">18%</span><div class="bar" style="--h:69%"></div><span class="bar-label">mangoes</span></div>
+            <div class="bar-wrap"><span class="prob">14%</span><div class="bar" style="--h:54%"></div><span class="bar-label">coconut</span></div>
+            <div class="bar-wrap"><span class="prob">11%</span><div class="bar" style="--h:42%"></div><span class="bar-label">pineapple</span></div>
+            <div class="bar-wrap"><span class="prob">9%</span><div class="bar" style="--h:35%"></div><span class="bar-label">guava</span></div>
+            <div class="bar-wrap"><span class="prob">7%</span><div class="bar" style="--h:27%"></div><span class="bar-label">oranges</span></div>
+            <div class="bar-wrap"><span class="prob">7%</span><div class="bar" style="--h:27%"></div><span class="bar-label">other</span></div>
+          </div>
+          <div class="context-strip" aria-label="Token context">
+            <span class="token">My</span><span class="token">favourite</span><span class="token">tropical</span><span class="token">fruits</span><span class="token">are</span><span class="arrow">→</span><span class="token next">?</span>
+          </div>
+        </article>
+
+        <article class="scene" data-scene="1">
+          <div class="scene-kicker">Step 02 · Private signal</div>
+          <h2>Context and a secret key create a scoring lens.</h2>
+          <p class="scene-intro">A pseudorandom <em>g-function</em> assigns candidate tokens different scores at each tournament layer. The values look random without the private configuration.</p>
+          <div class="hash-layout">
+            <div class="input-stack">
+              <div class="datum"><small>Recent context</small><code>tropical · fruits · are</code></div>
+              <div class="datum"><small>Private watermark key</small><code>9d1f · 48ac · 77e2 · ••••</code></div>
+            </div>
+            <div class="hash-arrow" aria-hidden="true">→</div>
+            <div class="g-matrix" aria-label="Illustrative g values">
+              <div class="g-cell head">Candidate</div><div class="g-cell head">g₁</div><div class="g-cell head">g₂</div><div class="g-cell head">g₃</div>
+              <div class="g-cell token-name">bananas</div><div class="g-cell one">1</div><div class="g-cell">0</div><div class="g-cell one">1</div>
+              <div class="g-cell token-name">mangoes</div><div class="g-cell">0</div><div class="g-cell one">1</div><div class="g-cell">0</div>
+              <div class="g-cell token-name">coconut</div><div class="g-cell one">1</div><div class="g-cell one">1</div><div class="g-cell one">1</div>
+              <div class="g-cell token-name">papaya</div><div class="g-cell">0</div><div class="g-cell">0</div><div class="g-cell one">1</div>
+              <div class="g-cell token-name">guava</div><div class="g-cell one">1</div><div class="g-cell">0</div><div class="g-cell">0</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="scene" data-scene="2">
+          <div class="scene-kicker">Step 03 · Tournament sampling</div>
+          <h2>Likely tokens enter. High-scoring tokens advance.</h2>
+          <p class="scene-intro">Candidates are first sampled from the model's own probability distribution. Pairwise rounds use successive g-functions, nudging the choice without simply replacing the model's judgement.</p>
+          <div class="tournament" aria-label="Three-round token tournament">
+            <div class="round">
+              <div class="round-label">8 sampled candidates</div>
+              <div class="candidate winner"><span>bananas · 26%</span><span class="g-badge">g₁ 1</span></div>
+              <div class="candidate"><span>mangoes · 18%</span><span class="g-badge">g₁ 0</span></div>
+              <div class="candidate winner"><span>coconut · 14%</span><span class="g-badge">g₁ 1</span></div>
+              <div class="candidate"><span>bananas · 26%</span><span class="g-badge">g₁ 0</span></div>
+              <div class="candidate winner"><span>guava · 9%</span><span class="g-badge">g₁ 1</span></div>
+              <div class="candidate"><span>papaya · 8%</span><span class="g-badge">g₁ 0</span></div>
+              <div class="candidate winner"><span>mangoes · 18%</span><span class="g-badge">g₁ 1</span></div>
+              <div class="candidate"><span>oranges · 7%</span><span class="g-badge">g₁ 0</span></div>
+            </div>
+            <div class="round-arrow">→</div>
+            <div class="round">
+              <div class="round-label">Round 2 · g₂</div>
+              <div class="candidate"><span>bananas</span><span class="g-badge">0</span></div>
+              <div class="candidate winner"><span>coconut</span><span class="g-badge">1</span></div>
+              <div class="candidate"><span>guava</span><span class="g-badge">0</span></div>
+              <div class="candidate winner"><span>mangoes</span><span class="g-badge">1</span></div>
+            </div>
+            <div class="round-arrow">→</div>
+            <div class="round">
+              <div class="round-label">Round 3 · g₃</div>
+              <div class="candidate winner"><span>coconut</span><span class="g-badge">1</span></div>
+              <div class="candidate"><span>mangoes</span><span class="g-badge">0</span></div>
+            </div>
+            <div class="round-arrow">→</div>
+            <div class="round">
+              <div class="round-label">Next token</div>
+              <div class="candidate final"><span>coconut</span><span class="g-badge">✓</span></div>
+            </div>
+          </div>
+        </article>
+
+        <article class="scene" data-scene="3">
+          <div class="scene-kicker">Step 04 · Autoregressive loop</div>
+          <h2>The pattern emerges across a passage—not in one word.</h2>
+          <p class="scene-intro">The winning token joins the context, then the model predicts again. Individual choices remain natural; many small correlations accumulate into detectable evidence.</p>
+          <div class="sequence-box" id="sequenceBox">
+            My favourite tropical fruits are <span class="watermarked-word" data-g="g .78">coconut</span>, <span class="watermarked-word" data-g="g .71">mangoes</span>, and <span class="watermarked-word" data-g="g .81">papaya</span>. Their <span class="watermarked-word" data-g="g .74">bright</span> flavours make a <span class="watermarked-word" data-g="g .76">simple</span> breakfast feel like <span class="watermarked-word" data-g="g .83">summer</span>.
+          </div>
+          <button class="reveal-btn" id="revealBtn" type="button">Reveal the invisible statistical pattern</button>
+        </article>
+
+        <article class="scene" data-scene="4">
+          <div class="scene-kicker">Step 05 · Detection</div>
+          <h2>Replay the scoring lens, then aggregate the evidence.</h2>
+          <p class="scene-intro">Given the same private configuration, a detector reconstructs g-values from the text. Watermarked passages tend to score higher; a trained Bayesian classifier can turn that evidence into a likelihood.</p>
+          <div class="detector-grid">
+            <div class="score-panel">
+              <div class="score-formula">score(x) = mean of g(token, context, key)</div>
+              <div class="score-track" aria-label="Illustrative detection score">
+                <div class="score-fill" id="scoreFill"></div>
+                <div class="threshold"></div>
+              </div>
+              <div class="score-labels"><span>looks unmarked</span><span>stronger watermark evidence</span></div>
+            </div>
+            <div class="verdict" aria-live="polite">
+              <small>Illustrative detector result</small>
+              <strong id="verdictValue">76% likely</strong>
+              <p id="verdictNote">Enough repeated evidence crosses the decision threshold.</p>
+            </div>
+          </div>
+          <div class="lab">
+            <h3>Try the two forces that matter most</h3>
+            <div class="sliders">
+              <div class="slider-row">
+                <label for="lengthSlider"><span>Passage length</span><output id="lengthOut">160 tokens</output></label>
+                <input id="lengthSlider" type="range" min="20" max="400" value="160" step="10" />
+                <div class="slider-note">Longer text usually supplies more statistical evidence.</div>
+              </div>
+              <div class="slider-row">
+                <label for="entropySlider"><span>Choice / entropy</span><output id="entropyOut">medium</output></label>
+                <input id="entropySlider" type="range" min="1" max="100" value="58" />
+                <div class="slider-note">More viable next-token choices give the sampler room to embed a mark.</div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="takeaways">
+      <div>
+        <div class="scene-kicker">The mental model</div>
+        <h2>SynthID changes <em>how tokens are sampled</em>, then looks for the same statistical fingerprint later.</h2>
+        <div class="rule-list">
+          <div class="rule"><span class="rule-num">1</span><div><strong>It is generative, not post-processing.</strong><p>The watermark enters during next-token selection rather than being appended as visible characters.</p></div></div>
+          <div class="rule"><span class="rule-num">2</span><div><strong>The key and configuration are part of the detector.</strong><p>Each deployed configuration needs a matching trained detector, and the private key material should stay private.</p></div></div>
+          <div class="rule"><span class="rule-num">3</span><div><strong>Confidence is statistical, not absolute.</strong><p>Longer, higher-entropy text is easier to detect. Heavy rewriting or translation can weaken the signal.</p></div></div>
+        </div>
+      </div>
+      <aside class="caveat">
+        <strong>Important limitation</strong>
+        <p>This page visualizes the mechanism; it does not run the production SynthID detector. No text detector is foolproof, and a result should be treated as evidence—not proof of authorship.</p>
+      </aside>
+    </section>
+
+    <footer>
+      <div class="sources">
+        <strong>Sources</strong>
+        <a href="https://huggingface.co/blog/synthid-text" target="_blank" rel="noreferrer">[1] Hugging Face — Introducing SynthID Text</a>
+        <a href="https://deepmind.google/technologies/synthid/" target="_blank" rel="noreferrer">[2] Google DeepMind — SynthID</a>
+        <a href="https://www.nature.com/articles/s41586-024-08025-4" target="_blank" rel="noreferrer">[3] Nature — Scalable watermarking for identifying LLM outputs</a>
+      </div>
+      <span class="tag">Conceptual visualization · 2026</span>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      const scenes = [...document.querySelectorAll('.scene')];
+      const stepButtons = [...document.querySelectorAll('.step-btn')];
+      const count = document.getElementById('stepCount');
+      const playBtn = document.getElementById('playBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      let active = 0;
+      let timer = null;
+
+      function showStep(index) {
+        active = Math.max(0, Math.min(scenes.length - 1, index));
+        scenes.forEach((scene, i) => scene.classList.toggle('active', i === active));
+        stepButtons.forEach((button, i) => {
+          button.classList.toggle('active', i === active);
+          button.classList.toggle('complete', i < active);
+          button.setAttribute('aria-current', i === active ? 'step' : 'false');
+        });
+        count.textContent = `Step ${active + 1} of ${scenes.length}`;
+        prevBtn.disabled = active === 0;
+        nextBtn.disabled = active === scenes.length - 1;
+      }
+
+      function stopPlayback() {
+        if (timer) window.clearInterval(timer);
+        timer = null;
+        playBtn.textContent = '▶ Play the pipeline';
+      }
+
+      function play() {
+        if (timer) {
+          stopPlayback();
+          return;
+        }
+        if (active === scenes.length - 1) showStep(0);
+        playBtn.textContent = 'Ⅱ Pause';
+        timer = window.setInterval(() => {
+          if (active >= scenes.length - 1) {
+            stopPlayback();
+          } else {
+            showStep(active + 1);
+          }
+        }, 2200);
+      }
+
+      stepButtons.forEach(button => button.addEventListener('click', () => {
+        stopPlayback();
+        showStep(Number(button.dataset.step));
+      }));
+      prevBtn.addEventListener('click', () => { stopPlayback(); showStep(active - 1); });
+      nextBtn.addEventListener('click', () => { stopPlayback(); showStep(active + 1); });
+      resetBtn.addEventListener('click', () => { stopPlayback(); showStep(0); });
+      playBtn.addEventListener('click', play);
+
+      const sequenceBox = document.getElementById('sequenceBox');
+      const revealBtn = document.getElementById('revealBtn');
+      revealBtn.addEventListener('click', () => {
+        const revealed = sequenceBox.classList.toggle('reveal');
+        revealBtn.textContent = revealed ? 'Hide the statistical overlay' : 'Reveal the invisible statistical pattern';
+      });
+
+      const lengthSlider = document.getElementById('lengthSlider');
+      const entropySlider = document.getElementById('entropySlider');
+      const lengthOut = document.getElementById('lengthOut');
+      const entropyOut = document.getElementById('entropyOut');
+      const scoreFill = document.getElementById('scoreFill');
+      const verdictValue = document.getElementById('verdictValue');
+      const verdictNote = document.getElementById('verdictNote');
+
+      function updateLab() {
+        const length = Number(lengthSlider.value);
+        const entropy = Number(entropySlider.value);
+        const lengthEffect = Math.sqrt(length / 400);
+        const entropyEffect = entropy / 100;
+        const score = Math.max(8, Math.min(96, Math.round(18 + 78 * lengthEffect * entropyEffect)));
+        lengthOut.textContent = `${length} tokens`;
+        entropyOut.textContent = entropy < 34 ? 'low' : entropy < 68 ? 'medium' : 'high';
+        scoreFill.style.width = `${score}%`;
+        verdictValue.textContent = `${score}% likely`;
+        if (score >= 62) {
+          verdictNote.textContent = 'Illustrative evidence crosses the decision threshold.';
+        } else if (score >= 42) {
+          verdictNote.textContent = 'The signal is ambiguous; more evidence would help.';
+        } else {
+          verdictNote.textContent = 'Too little reliable evidence for a positive result.';
+        }
+      }
+
+      lengthSlider.addEventListener('input', updateLab);
+      entropySlider.addEventListener('input', updateLab);
+      document.addEventListener('keydown', event => {
+        if (event.key === 'ArrowRight') { stopPlayback(); showStep(active + 1); }
+        if (event.key === 'ArrowLeft') { stopPlayback(); showStep(active - 1); }
+        if (event.key === ' ') { event.preventDefault(); play(); }
+      });
+
+      updateLab();
+      showStep(0);
+    })();
+  </script>
+</body>
+</html>

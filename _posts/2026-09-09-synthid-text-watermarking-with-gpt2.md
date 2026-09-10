@@ -3,6 +3,7 @@ layout: post
 title: "Making a text watermark visible with GPT-2 and SynthID"
 date: 2026-09-09 22:50:00 +0700
 description: "I built a local lab to generate, inspect, and detect SynthID-watermarked text—and to compare the server workflow with browser-native WebGPU inference."
+demo_url: /lab/synthid-text-watermarking-with-gpt2/demo/
 tags: [llm, watermarking, synthid, webgpu]
 ---
 
@@ -13,6 +14,18 @@ of text.
 
 I built **SynthID Text Lab** to make that process tangible: generate a passage,
 copy it, paste it into a detector, and inspect the resulting score.
+
+## Try the interactive WebGPU demo
+
+The browser edition runs NanoChat d32 locally through Transformers.js and WebGPU.
+It does not need my Python server, and your prompt stays in your browser. The first
+run downloads about 2.7 GB of quantized model files from Hugging Face.
+
+<p><a class="button primary" href="/lab/synthid-text-watermarking-with-gpt2/demo/">Launch the WebGPU demo →</a></p>
+
+The browser output is deliberately unwatermarked because public JavaScript cannot
+protect a SynthID key. You can also [open the interactive SynthID mechanism
+visualization](/lab/synthid-text-watermarking-with-gpt2/how-it-works/).
 
 ![SynthID Text Lab interface showing the generation and detection workflow]({{ '/assets/lab/synthid-text-lab.png' | relative_url }})
 

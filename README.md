@@ -55,6 +55,12 @@ git push origin main
 
 An unpublished writing template is available at `_drafts/article-template.md`.
 
+## Interactive Lab entries
+
+Lab posts should keep a working interactive browser experience whenever the experiment can run safely on GitHub Pages. Put the demo under `/lab/<article-slug>/demo/`, set `demo_url` in the post front matter, and keep a clear fallback explanation when the required capability is unavailable. The homepage and Lab index automatically show a **Live demo** link when `demo_url` is present.
+
+Do not move private keys or server-only credentials into browser JavaScript merely to make a demo static. When the complete experiment needs a backend, preserve a safe browser-side subset or explainer and clearly label what it does not reproduce.
+
 ## Supported Markdown
 
 GitHub Pages renders headings, links, images, lists, blockquotes, fenced code blocks, inline code, and tables through Jekyll and Kramdown.

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Run NanoChat d32 locally in your browser with Transformers.js and WebGPU.">
+  <meta name="theme-color" content="#f1ede2">
+  <title>NanoChat WebGPU · SynthID Text Lab</title>
+  <link rel="stylesheet" href="/assets/demos/synthid-text/app.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="/lab/synthid-text-watermarking-with-gpt2/" aria-label="Back to the SynthID Text Lab article">
+        <span class="brand-mark">S</span>
+        <span><strong>SynthID Text Lab</strong><small>Public WebGPU experiment</small></span>
+      </a>
+      <nav aria-label="Experiment navigation">
+        <a class="nav-link" href="/lab/synthid-text-watermarking-with-gpt2/">Article</a>
+        <a class="nav-link active" href="/lab/synthid-text-watermarking-with-gpt2/demo/" aria-current="page">Demo</a>
+        <a class="nav-link" href="/lab/synthid-text-watermarking-with-gpt2/how-it-works/" target="_blank">How it works ↗</a>
+      </nav>
+      <div class="model-pill" aria-live="polite">
+        <span id="statusDot" class="ready"></span>
+        <span id="statusText">Checking WebGPU…</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <div class="eyebrow">Browser-native experiment · no backend</div>
+          <h1>Run NanoChat<br><em>on your GPU.</em></h1>
+        </div>
+        <div class="intro-copy">
+          <p>Generate with NanoChat d32 directly in this browser through Transformers.js and WebGPU. Your prompt and output are not sent to my server.</p>
+          <a class="learn-link" href="/lab/synthid-text-watermarking-with-gpt2/how-it-works/" target="_blank">Explore the SynthID mechanism <span>→</span></a>
+        </div>
+      </section>
+
+      <aside class="download-notice">
+        <div class="notice-icon" aria-hidden="true">↓</div>
+        <div>
+          <strong>Large first download</strong>
+          <p>The quantized NanoChat model is about 2.7 GB. Your browser downloads it from Hugging Face on the first run and can reuse its local cache afterward.</p>
+        </div>
+      </aside>
+
+      <p class="compatibility" id="compatibility" role="status">Checking this browser for WebGPU support…</p>
+
+      <section class="workspace" aria-label="NanoChat WebGPU generator">
+        <article class="panel generator-panel">
+          <div class="panel-head">
+            <div><span class="panel-number">01</span><h2>Prompt</h2></div>
+            <span class="method-tag">NanoChat d32 · q4</span>
+          </div>
+
+          <label class="field-label" for="prompt">What should NanoChat respond to?</label>
+          <textarea id="prompt" rows="7" placeholder="Ask NanoChat something…">Explain why statistical text watermarking needs enough tokens to detect a signal.</textarea>
+
+          <div class="settings-grid">
+            <label>
+              <span>Length <output id="lengthValue">80 tokens</output></span>
+              <input id="maxTokens" type="range" min="20" max="200" step="10" value="80">
+            </label>
+            <label>
+              <span>Temperature <output id="tempValue">0.8</output></span>
+              <input id="temperature" type="range" min="0.1" max="2" step="0.1" value="0.8">
+            </label>
+          </div>
+
+          <button class="action-btn" id="generateBtn" type="button" disabled>
+            <span>Checking WebGPU…</span><span>→</span>
+          </button>
+          <p class="cold-note">Keep this tab open during the first download. Generation happens locally after the model loads.</p>
+        </article>
+
+        <article class="panel output-panel">
+          <div class="panel-head">
+            <div><span class="panel-number">02</span><h2>Output</h2></div>
+            <button class="quiet-btn" id="copyBtn" type="button" disabled>Copy</button>
+          </div>
+          <div class="output empty" id="generatedOutput" tabindex="0">Your NanoChat continuation will appear here.</div>
+          <div class="privacy-note">
+            <strong>Unwatermarked by design.</strong>
+            <p>A secure SynthID key cannot be shipped in public client-side JavaScript. The Python experiment handles watermark generation and detection; this page demonstrates only local WebGPU inference.</p>
+          </div>
+        </article>
+      </section>
+
+      <aside class="credits">
+        <strong>Runs in your browser.</strong>
+        <span>Model by <a href="https://github.com/karpathy/nanochat" target="_blank" rel="noreferrer">Andrej Karpathy</a> · <a href="https://huggingface.co/onnx-community/nanochat-d32-ONNX" target="_blank" rel="noreferrer">ONNX conversion</a> · <a href="https://github.com/huggingface/transformers.js" target="_blank" rel="noreferrer">Transformers.js</a></span>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="/assets/demos/synthid-text/app.js"></script>
+</body>
+</html>

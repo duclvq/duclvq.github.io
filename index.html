@@ -34,7 +34,10 @@ description: Experiments, pet projects, and notes by Le Viet Duc.
         </div>
         <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
         {% if post.description %}<p>{{ post.description }}</p>{% endif %}
-        <a class="text-link" href="{{ post.url | relative_url }}">Read entry →</a>
+        <div class="card-links">
+          <a class="text-link" href="{{ post.url | relative_url }}">Read entry →</a>
+          {% if post.demo_url %}<a class="demo-link" href="{{ post.demo_url | relative_url }}">Live demo ↗</a>{% endif %}
+        </div>
       </article>
     {% endfor %}
   </div>
