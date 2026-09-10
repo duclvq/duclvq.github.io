@@ -42,6 +42,22 @@ class MarkdownPublishingTests(unittest.TestCase):
         self.assertTrue(home.startswith("---\n"), "Home must be processed by Jekyll")
         self.assertIn("site.posts", home)
 
+    def test_post_authorship_marks_distinguish_assistant_and_owner(self):
+        home = (ROOT / "index.html").read_text()
+        lab = (ROOT / "lab/index.html").read_text()
+        post_layout = (ROOT / "_layouts/post.html").read_text()
+        css = (ROOT / "assets/site.css").read_text()
+        for template in [home, lab]:
+            self.assertIn("entry-card--assistant", template)
+            self.assertIn("entry-card--owner", template)
+            self.assertIn("authorship--assistant", template)
+            self.assertIn("authorship--owner", template)
+        self.assertIn("article-shell--assistant", post_layout)
+        self.assertIn("article-shell--owner", post_layout)
+        self.assertIn("authorship--assistant", post_layout)
+        self.assertIn(".authorship--assistant", css)
+        self.assertIn(".authorship--owner", css)
+
     def test_example_entry_is_valid_markdown_with_front_matter(self):
         entry = (ROOT / "_posts/2026-09-09-welcome-to-my-lab.md").read_text()
         self.assertTrue(entry.startswith("---\n"))

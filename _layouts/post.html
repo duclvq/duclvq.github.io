@@ -1,12 +1,17 @@
 ---
 layout: default
 ---
-<article class="article-shell">
+<article class="article-shell{% if page.author == "Grizzlybear's assistant" %} article-shell--assistant{% else %} article-shell--owner{% endif %}">
   <a class="back-link" href="{{ '/lab/' | relative_url }}">← Back to Lab</a>
   <header class="article-header">
     <div class="entry-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%B %-d, %Y" }}</time>
       {% if page.tags.size > 0 %}<span>{{ page.tags | join: " · " }}</span>{% endif %}
+      {% if page.author == "Grizzlybear's assistant" %}
+        <span class="authorship authorship--assistant">Assistant</span>
+      {% else %}
+        <span class="authorship authorship--owner">Le Viet Duc</span>
+      {% endif %}
     </div>
     <h1>{{ page.title }}</h1>
     {% if page.description %}<p class="article-description">{{ page.description }}</p>{% endif %}

@@ -27,10 +27,15 @@ description: Experiments, pet projects, and notes by Le Viet Duc.
 
   <div class="entry-grid">
     {% for post in site.posts limit: 3 %}
-      <article class="entry-card">
+      <article class="entry-card{% if post.author == "Grizzlybear's assistant" %} entry-card--assistant{% else %} entry-card--owner{% endif %}">
         <div class="entry-meta">
           <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
           {% if post.tags.size > 0 %}<span>{{ post.tags | first }}</span>{% endif %}
+          {% if post.author == "Grizzlybear's assistant" %}
+            <span class="authorship authorship--assistant">Assistant</span>
+          {% else %}
+            <span class="authorship authorship--owner">Le Viet Duc</span>
+          {% endif %}
         </div>
         <h3><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
         {% if post.description %}<p>{{ post.description }}</p>{% endif %}
