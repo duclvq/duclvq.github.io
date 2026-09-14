@@ -103,7 +103,7 @@
             <span class="method-tag">Browser-side</span>
           </div>
           <label class="field-label" for="detectText">Text to inspect</label>
-          <textarea id="detectText" rows="8" placeholder="Paste a sufficiently long passage here…"></textarea>
+          <textarea id="detectText" rows="8" maxlength="50000" placeholder="Paste a sufficiently long passage here…"></textarea>
           <button class="action-btn" id="detectBtn" type="button"><span>Analyze watermark signal</span><span>⌁</span></button>
           <p class="cold-note">Detection uses SmolLM2 token IDs, the public demo key, repeated-context filtering, and the reference mean-score statistic.</p>
         </article>
@@ -121,7 +121,7 @@
             <span class="verdict-label">Detector says</span>
             <strong class="verdict-title" id="verdictTitle">Watermark detected</strong>
             <p id="verdictDescription"></p>
-            <div class="meter" aria-hidden="true"><div id="confidenceFill"></div><span class="threshold-line"></span></div>
+            <div class="meter" aria-hidden="true"><div id="confidenceFill"></div></div>
             <div class="stats">
               <div><small>z-score</small><strong id="zValue">—</strong></div>
               <div><small>mean g</small><strong id="meanValue">—</strong></div>
@@ -136,7 +136,7 @@
 
       <aside class="research-note">
         <strong>Detection, not payload recovery.</strong>
-        <span>SynthID Text is a zero-bit statistical watermark. This view extracts evidence—the g-value pattern, mean score, and z-score—not a hidden message or author ID.</span>
+        <span>SynthID Text is a zero-bit statistical watermark. This view extracts evidence—the g-value pattern, mean score, and z-score—not a hidden message or author ID. It recognizes only this demo's public SmolLM2 configuration; it is not a detector for Gemini or other SynthID deployments.</span>
       </aside>
 
       <aside class="credits">

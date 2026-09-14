@@ -46,3 +46,16 @@ test("top-k watermarking keeps only candidates and changes their distribution", 
   assert.notDeepEqual(Array.from(marked), Array.from(plain));
   assert.equal(Array.from(marked).filter(Number.isFinite).length, 3);
 });
+
+test("reports stable statistics and rejects unusable candidate logits", () => {
+  const analysis = analyzeTokenIds([10, 20, 30, 40, 50, 60, 70, 80]);
+  const expectedZ = (analysis.meanGScore - 0.5)
+    / Math.sqrt(0.25 / (analysis.tokensScored * DEFAULT_SYNTHID_CONFIG.keys.length));
+  assert.equal(analysis.zScore, expectedZ);
+  assert.ok(analysis.confidence >= 0 && analysis.confidence <= 1);
+  assert.equal(analysis.threshold, 3);
+  assert.throws(
+    () => applyTopKWatermark([NaN, -Infinity], [1, 2, 3, 4], { watermark: false, topK: 2 }),
+    /No finite candidate logits/,
+  );
+});

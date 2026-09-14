@@ -254,7 +254,7 @@ input[type="range"] { width: 100%; margin-top: 9px; accent-color: var(--accent);
 .meter { position: relative; height: 11px; margin: 26px 0 24px; border-radius: 999px; background: #36423c; }
 .meter > div { width: 0; height: 100%; border-radius: inherit; background: #42b99f; transition: width .45s ease; }
 .meter > div.negative { background: #e65032; }
-.threshold-line { position: absolute; left: 62%; top: -6px; width: 2px; height: 23px; background: #f18a73; }
+
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #3f4a45; border-left: 1px solid #3f4a45; }
 .stats div { padding: 12px; border-right: 1px solid #3f4a45; border-bottom: 1px solid #3f4a45; }
 .stats small, .stats strong { display: block; }

@@ -126,9 +126,47 @@ export function analyzeTokenIds(tokenIds, config = DEFAULT_SYNTHID_CONFIG) {
 }
 
 function topIndices(logits, count) {
-  return Array.from({ length: logits.length }, (_, index) => index)
-    .sort((left, right) => logits[right] - logits[left])
-    .slice(0, Math.min(count, logits.length));
+  const limit = Math.max(1, Math.min(count, logits.length));
+  const heap = [];
+  const swap = (left, right) => {
+    [heap[left], heap[right]] = [heap[right], heap[left]];
+  };
+  const siftUp = (start) => {
+    let index = start;
+    while (index > 0) {
+      const parent = Math.floor((index - 1) / 2);
+      if (heap[parent].value <= heap[index].value) break;
+      swap(parent, index);
+      index = parent;
+    }
+  };
+  const siftDown = (start) => {
+    let index = start;
+    while (true) {
+      const left = index * 2 + 1;
+      const right = left + 1;
+      let smallest = index;
+      if (left < heap.length && heap[left].value < heap[smallest].value) smallest = left;
+      if (right < heap.length && heap[right].value < heap[smallest].value) smallest = right;
+      if (smallest === index) return;
+      swap(index, smallest);
+      index = smallest;
+    }
+  };
+
+  for (let index = 0; index < logits.length; index += 1) {
+    const value = Number(logits[index]);
+    if (!Number.isFinite(value)) continue;
+    if (heap.length < limit) {
+      heap.push({ index, value });
+      siftUp(heap.length - 1);
+    } else if (value > heap[0].value) {
+      heap[0] = { index, value };
+      siftDown(0);
+    }
+  }
+  if (!heap.length) throw new RangeError("No finite candidate logits were available.");
+  return heap.map((candidate) => candidate.index);
 }
 
 export function applyTopKWatermark(

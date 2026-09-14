@@ -104,7 +104,8 @@ function decodeToken(tokenizer, tokenId) {
 
 function inspectText(tokenizer, text) {
   const cleanText = String(text ?? "").trim();
-  if (!cleanText) throw new Error("Enter or paste text to inspect.");
+  if (cleanText.length < 10) throw new RangeError("Text must contain at least 10 characters.");
+  if (cleanText.length > 50_000) throw new RangeError("Text must contain at most 50,000 characters.");
   const tokenIds = tokenIdsForText(tokenizer, cleanText);
   const analysis = analyzeTokenIds(tokenIds);
   return {

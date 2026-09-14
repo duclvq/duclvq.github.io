@@ -221,7 +221,15 @@ sendBtn.addEventListener("click", () => {
 });
 
 detectBtn.addEventListener("click", async () => {
-  const text = detectText.value;
+  const text = detectText.value.trim();
+  if (text.length < 10) {
+    showToast("Text must contain at least 10 characters.", true);
+    return;
+  }
+  if (text.length > 50_000) {
+    showToast("Limit detection input to 50,000 characters.", true);
+    return;
+  }
   clearVerdict();
   setDetectBusy(true);
   try {
